@@ -46,4 +46,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function borrowedBooks() {
+        return $this->hasMany(BorrowedBook::class);
+    }
+
+    public function loans() {
+        return $this->hasMany(BorrowedBook::class)
+                    ->groupBy('identifier')
+                    ->selectRaw('identifier, COUNT(1) as total_books');
+    }
 }
