@@ -4,7 +4,7 @@
 use App\Models\BorrowedBook;
 use App\Models\Book;
 use App\Models\User;
-use Carbon\CarbonImmutable;
+use Illuminate\Support\Carbon;
 
 it('can create a BorrowedBook with the factory', function () {
     $borrowedBook = BorrowedBook::factory()->create();
@@ -37,7 +37,7 @@ it('casts started_at and ended_at to datetime', function () {
     ]);
 
     expect($borrowedBook)
-        ->started_at->toBeInstanceOf(CarbonImmutable::class)
-        ->ended_at->toBeInstanceOf(CarbonImmutable::class);
+        ->started_at->toBeInstanceOf(Carbon::class)
+        ->ended_at->toBeInstanceOf(Carbon::class);
 
 })->group('models');
