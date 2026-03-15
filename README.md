@@ -89,7 +89,7 @@ php artisan test --coverage
 ## TODO do desafio
 
 - [x] Ambiente: subir via docker compose padrão.
-- [ ] Autenticação com Laravel Breeze e rotas protegidas (backend e frontend).
+- [x] Autenticação com Laravel Breeze e rotas protegidas (backend e frontend).
 - [x] Modelagem: livros e empréstimos (com relacionamentos coerentes) com seeder >= 10 livros.
 - [ ] CRUD: Livros e Empréstimos
 - [ ] Validação: Estoque consistente mesmo com acessos simultâneos.
