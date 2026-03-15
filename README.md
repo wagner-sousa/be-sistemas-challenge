@@ -32,10 +32,11 @@ casos de uso devem ser implementados.
 ## 🚀 Instalando
 
 ### Com Dev Container (Recomendado)
+
 - Abra o projeto no VS CodE
 - Execute `> Dev Containers: Reopen in Container`.
 
-## Diretamente pelo Docker Compose
+### Diretamente pelo Docker Compose
 
 - Suba o stack principal (usa .devcontainer como fonte):
 ```sh
@@ -43,6 +44,7 @@ casos de uso devem ser implementados.
 ```
 
 ## ▶️ Executando
+
 - Dentro do container, configure o app e o banco:
 ```sh
     cp .env.example .env
@@ -62,6 +64,19 @@ npm run dev -- --host --port 5173
 ```sh
 docker compose -f .devcontainer/docker-compose.yml down -v
 ```
+
+## 🧪 Testando
+
+Execute os testes dentro do container com:
+```sh
+php artisan test
+```
+
+Para gerar relatório de cobertura (requer Xdebug):
+```sh
+php artisan test --coverage
+```
+
 
 ## TODO do desafio
 
