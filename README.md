@@ -7,7 +7,7 @@ simplificado. O sistema permitirá que usuários autenticados visualizem um acer
 solicitem o empréstimo de exemplares disponíveis, com controle de estoque e histórico.
 
 
->[!NOTE] Importante
+>[!NOTE]
 > O desafio deve demonstrar maturidade em consistência de dados, concorrência, 
 qualidade de API (retornos corretos), SQL, Idempotência (quando usar), e frontend 
 com gerenciamento de estado. Esses detalhes devem ser identificados em quais regras e 
