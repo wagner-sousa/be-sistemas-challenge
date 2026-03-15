@@ -47,11 +47,19 @@ casos de uso devem ser implementados.
 
 - Dentro do container, configure o app e o banco:
 ```sh
-    cp .env.example .env
-    php artisan key:generate
-    composer install
-    npm install --legacy-peer-deps
-    php artisan migrate --seed
+cp .env.example .env
+```
+```sh
+php artisan key:generate
+```
+```sh
+composer install
+```
+```sh
+npm install --legacy-peer-deps
+```
+```sh
+php artisan migrate --seed
 ```
 - Rodar front em modo dev (opcional, com portas já encaminhadas):
 ```sh
