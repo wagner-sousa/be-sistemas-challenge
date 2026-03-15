@@ -50,7 +50,7 @@ casos de uso devem ser implementados.
     cp .env.example .env
     php artisan key:generate
     composer install
-    npm install
+    npm install --legacy-peer-deps
     php artisan migrate --seed
 ```
 - Rodar front em modo dev (opcional, com portas já encaminhadas):
