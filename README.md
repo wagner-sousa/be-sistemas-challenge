@@ -47,11 +47,19 @@ casos de uso devem ser implementados.
 
 - Dentro do container, configure o app e o banco:
 ```sh
-    cp .env.example .env
-    php artisan key:generate
-    composer install
-    npm install
-    php artisan migrate --seed
+cp .env.example .env
+```
+```sh
+php artisan key:generate
+```
+```sh
+composer install
+```
+```sh
+npm install --legacy-peer-deps
+```
+```sh
+php artisan migrate --seed
 ```
 - Rodar front em modo dev (opcional, com portas já encaminhadas):
 ```sh
@@ -81,7 +89,7 @@ php artisan test --coverage
 ## TODO do desafio
 
 - [x] Ambiente: subir via docker compose padrão.
-- [ ] Autenticação com Laravel Breeze e rotas protegidas (backend e frontend).
+- [x] Autenticação com Laravel Breeze e rotas protegidas (backend e frontend).
 - [x] Modelagem: livros e empréstimos (com relacionamentos coerentes) com seeder >= 10 livros.
 - [ ] CRUD: Livros e Empréstimos
 - [ ] Validação: Estoque consistente mesmo com acessos simultâneos.
