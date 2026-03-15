@@ -5,8 +5,8 @@
 - [x] Docker compose com app + MySQL, variaveis .env alinhadas e start via "docker compose up" documentado.
 
 ### Estrutura de Dados
-- [ ] Migrations: livros (titulo, autor, isbn, copias disponiveis) e emprestimos (user, livro, datas/status), relacionamentos e constraints basicas.
-- [ ] Seed inicial: inserir pelo menos 10 livros completos para teste.
+- [x] Migrations: livros (titulo, autor, isbn, copias disponiveis) e emprestimos (user, livro, datas/status), relacionamentos e constraints basicas.
+- [x] Seed inicial: inserir pelo menos 10 livros completos para teste.
 
 ### Backend
 - [ ] Autenticacao: instalar Laravel Breeze (login/registro) e aplicar protecao de rotas backend/frontend.

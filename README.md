@@ -67,7 +67,7 @@ docker compose -f .devcontainer/docker-compose.yml down -v
 
 - [x] Ambiente: subir via docker compose padrão.
 - [ ] Autenticação com Laravel Breeze e rotas protegidas (backend e frontend).
-- [ ] Modelagem: livros e empréstimos (com relacionamentos coerentes) com seeder >= 10 livros.
+- [x] Modelagem: livros e empréstimos (com relacionamentos coerentes) com seeder >= 10 livros.
 - [ ] CRUD: Livros e Empréstimos
 - [ ] Validação: Estoque consistente mesmo com acessos simultâneos.
 - [ ] Validação: Limite de três empréstimos ativos por pessoa
