@@ -23,7 +23,9 @@ final class BorrowedBookService
     /** @var Collection<Book> */
     private Collection $books;
 
-    public function __construct() {
+    public function __construct(
+        private BorrowedBookRepository $borrowedBookRepository
+    ) {
         $this->books = collect();
     }
 
@@ -36,6 +38,12 @@ final class BorrowedBookService
     }
 
     public function addBook(int $bookId): void {
+        throw_if(
+            $this->books->has($bookId),
+            \Exception::class,
+            'Livro já adicionado para empréstimo.'
+        );
+
         $this->checkBookPreparedQuantity();
         $book = Book::query()->findOrFail($bookId);
         $this->checkBookAvailable($book);
@@ -51,6 +59,12 @@ final class BorrowedBookService
     }
 
     public function commitBorrowBooks(): void {
+        throw_if(
+            $this->books->isEmpty(),
+            \Exception::class,
+            'Selecione ao menos um livro para emprestar.'
+        );
+
         $this->checkBorrowedBookByUser();
 
         DB::transaction(function (): void {
@@ -63,12 +77,14 @@ final class BorrowedBookService
                     ->firstOrFail();
 
                 $this->checkBookAvailable($lockedBook);
-                app(BorrowedBookRepository::class)->create([
+                $this->borrowedBookRepository->create([
                     'book_id' => $book->id,
                     'identifier' => $this->getIdentifier(),
                 ]);
             });
         });
+
+        $this->resetPreparedBooks();
     }
 
     public function checkBorrowedBookByUser(): void {
@@ -99,10 +115,7 @@ final class BorrowedBookService
     }
 
     public function returnAllBooks(string $identifier): void {
-        $borrowedBooks = app(BorrowedBookRepository::class)
-                            ->where('identifier', $identifier)
-                            ->where('ended_at', null)
-                            ->get();
+        $borrowedBooks = $this->borrowedBookRepository->getByIdentifier($identifier);
 
         throw_if(
             $borrowedBooks->isEmpty(),
@@ -112,10 +125,22 @@ final class BorrowedBookService
 
         DB::transaction(function () use ($borrowedBooks): void {
             $borrowedBooks->each(function (BorrowedBook $borrowedBook): void {
-                $borrowedBook->update([
-                    'ended_at' => now(),
-                ]);
+                $this->returnBook($borrowedBook);
             });
+        });
+    }
+
+    public function returnBook(BorrowedBook $borrowedBook): void {
+        throw_if(
+            !is_null($borrowedBook->ended_at),
+            \Exception::class,
+            'Este empréstimo já foi finalizado.',
+        );
+
+        DB::transaction(function () use ($borrowedBook): void {
+            $borrowedBook->update([
+                'ended_at' => now(),
+            ]);
         });
     }
 
@@ -134,6 +159,10 @@ final class BorrowedBookService
     }
 
     private function getBorrowBooksLimit(): int {
-        return (int) env('BORROWED_BOOKS_LIMIT', 3);
+        return (int) config('library.borrowed_books_limit', 3);
+    }
+
+    private function resetPreparedBooks(): void {
+        $this->books = collect();
     }
 }
