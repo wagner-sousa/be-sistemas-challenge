@@ -2,16 +2,29 @@
 
 namespace App\Models;
 
-use App\Events;
+use App\Data\BorrowedBookData;
 use Database\Factories\BorrowedBookFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Spatie\LaravelData\WithData;
 
 class BorrowedBook extends Model
 {
-    /** @use HasFactory<\Database\Factories\BorrowedBookFactory> */
+    /** @use HasFactory<BorrowedBookFactory> */
     use HasFactory;
+
+    use WithData;
+
+    protected $dataClass = BorrowedBookData::class;
+
+    protected $fillable = [
+        'book_id',
+        'user_id',
+        'identifier',
+        'started_at',
+        'ended_at',
+    ];
 
     protected $casts = [
         'started_at' => 'datetime',
@@ -23,44 +36,41 @@ class BorrowedBook extends Model
         'ended_at',
     ];
 
-    protected $dispatchesEvents = [
-        'created' => Events\BorrowedBookCreated::class,
-        'updated' => Events\BorrowedBookUpdated::class,
-    ];
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        static::creating(function (BorrowedBook $book): void {
+            if (! $book->user_id && Auth::check()) {
+                $book->user_id = Auth::id();
+            }
 
-    protected $fillable = [
-        'book_id',
-        'user_id',
-        'identifier',
-        'started_at',
-        'ended_at',
-    ];
-
-    public static function boot() {
-        parent::boot();
-
-        static::creating(function ($book) {
-            /** @var User $user */
-            $user = Auth::user();
-
-            $book->user_id = $user->id;
-            $book->started_at = now();
+            if (! $book->started_at) {
+                $book->started_at = now();
+            }
         });
     }
 
-    public function book() {
+    public function book()
+    {
         return $this->belongsTo(Book::class);
     }
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function getPredictedEndAtAttribute() {
-        return $this->started_at->addDays(env('BORROWED_BOOK_DURATION', 3));
+    public function getPredictedEndAtAttribute()
+    {
+        $durationInDays = (int) config('library.borrowed_book_duration', 3);
+
+        return $this->started_at?->addDays($durationInDays);
     }
 
-    public function getIsOverdueAttribute() {
-        return $this->predicted_end_at->isPast() && is_null($this->ended_at);
+    public function getIsOverdueAttribute()
+    {
+        return ($this->predicted_end_at?->isPast() ?? false) && is_null($this->ended_at);
     }
 }

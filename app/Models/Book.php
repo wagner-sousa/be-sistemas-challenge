@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Database\Factories\BookFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Book extends Model
 {
-    /** @use HasFactory<\Database\Factories\BookFactory> */
+    /** @use HasFactory<BookFactory> */
     use HasFactory;
 
     protected $casts = [
@@ -16,15 +17,26 @@ class Book extends Model
         'active' => 'boolean',
     ];
 
+    protected $fillable = [
+        'title',
+        'author_id',
+        'isbn_code',
+        'total_quantity',
+        'borrowed_quantity',
+        'active',
+    ];
+
     protected $appends = [
         'available_quantity',
     ];
 
-    public function author() {
+    public function author()
+    {
         return $this->belongsTo(Author::class);
     }
 
-    public function getAvailableQuantityAttribute() {
+    public function getAvailableQuantityAttribute()
+    {
         return $this->total_quantity - $this->borrowed_quantity;
     }
 }
