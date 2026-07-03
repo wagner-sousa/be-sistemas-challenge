@@ -16,6 +16,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "laravel/wayfinder": "^0.1.11",
+        "spatie/laravel-data": "^4.20",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {
@@ -110,6 +111,9 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true
+        },
+        "platform": {
+            "php": "8.4.0"
         }
     },
     "minimum-stability": "stable",
