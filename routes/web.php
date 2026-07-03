@@ -20,6 +20,8 @@ Route::get('/dashboard', function () {
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
+    Route::get('/books', [App\Http\Controllers\BookController::class, 'index'])->name('books.index');
+    Route::get('/loans/my-loans', [App\Http\Controllers\LoanController::class, 'myLoans'])->name('loans.my-loans');
     Route::post('/profile/api-tokens', [ApiTokenController::class, 'store'])->name('profile.api-tokens.store');
     Route::delete('/profile/api-tokens/{token}', [ApiTokenController::class, 'destroy'])->name('profile.api-tokens.destroy');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
