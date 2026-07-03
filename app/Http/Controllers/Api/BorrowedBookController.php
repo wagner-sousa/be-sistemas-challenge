@@ -6,26 +6,26 @@ use App\Data\BorrowedBookData;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BorrowBooksRequest;
 use App\Models\BorrowedBook;
+use App\Repositories\BorrowedBookRepository;
 use App\Services\BorrowedBookService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 
 class BorrowedBookController extends Controller
 {
-    public function __construct(private BorrowedBookService $borrowedBookService) {}
+    public function __construct(
+        private BorrowedBookService $borrowedBookService,
+        private BorrowedBookRepository $borrowedBookRepository
+    ) {}
 
-    public function index(Request $request): JsonResponse {
-        $borrowedBooks = BorrowedBook::query()
-            ->with(['book.author', 'user'])
-            ->where('user_id', $request->user()->id)
-            ->latest()
-            ->paginate();
+    public function index(Request $request): JsonResponse
+    {
+        $loans = $this->borrowedBookRepository->getUserLoansWithRawSql($request->user()->id);
 
-        $borrowedBooks->through(fn (BorrowedBook $borrowedBook) => BorrowedBookData::fromModel($borrowedBook)->toArray());
-
-        return response()->json($borrowedBooks);
+        return response()->json(['data' => $loans]);
     }
 
     public function store(BorrowBooksRequest $request): JsonResponse {
