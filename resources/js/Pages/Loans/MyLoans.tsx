@@ -1,3 +1,4 @@
+import PaginationComponent from '@/Components/Pagination';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Loan, useLibrary } from '@/contexts/LibraryContext';
 import { Head } from '@inertiajs/react';
@@ -46,6 +47,7 @@ const loanStatusChip = (loan: Loan): JSX.Element => {
 export default function MyLoans(): JSX.Element {
     const {
         loans,
+        loansPagination,
         loadingLoans,
         fetchLoans,
         returnLoan,
@@ -57,10 +59,15 @@ export default function MyLoans(): JSX.Element {
     const [feedback, setFeedback] = useState<string | null>(null);
     const [identifier, setIdentifier] = useState('');
     const [processing, setProcessing] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
-        fetchLoans();
-    }, [fetchLoans]);
+        fetchLoans(false, currentPage);
+    }, [fetchLoans, currentPage]);
+
+    const handlePageChange = (page: number): void => {
+        setCurrentPage(page);
+    };
 
     const handleReturn = async (loanId: number): Promise<void> => {
         setProcessing(true);
@@ -192,6 +199,16 @@ export default function MyLoans(): JSX.Element {
                         </TableBody>
                     </Table>
                 </TableContainer>
+
+                {loansPagination && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                        <PaginationComponent
+                            currentPage={loansPagination.currentPage}
+                            totalPages={loansPagination.totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    </Box>
+                )}
             </Stack>
             </Box>
 

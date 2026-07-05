@@ -1,3 +1,4 @@
+import PaginationComponent from '@/Components/Pagination';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Book, BookPayload, useLibrary } from '@/contexts/LibraryContext';
 import { Head } from '@inertiajs/react';
@@ -42,6 +43,7 @@ const emptyForm: BookPayload = {
 export default function Index(): JSX.Element {
     const {
         books,
+        booksPagination,
         loadingBooks,
         fetchBooks,
         createBook,
@@ -57,10 +59,15 @@ export default function Index(): JSX.Element {
     const [editingBook, setEditingBook] = useState<Book | null>(null);
     const [saving, setSaving] = useState(false);
     const [feedback, setFeedback] = useState<string | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
 
     useEffect(() => {
-        fetchBooks();
-    }, [fetchBooks]);
+        fetchBooks(false, currentPage);
+    }, [fetchBooks, currentPage]);
+
+    const handlePageChange = (page: number): void => {
+        setCurrentPage(page);
+    };
 
     const dialogTitle = useMemo(
         () => (editingBook ? 'Editar livro' : 'Novo livro'),
@@ -262,6 +269,16 @@ export default function Index(): JSX.Element {
                         </TableBody>
                     </Table>
                 </TableContainer>
+
+                {booksPagination && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+                        <PaginationComponent
+                            currentPage={booksPagination.currentPage}
+                            totalPages={booksPagination.totalPages}
+                            onPageChange={handlePageChange}
+                        />
+                    </Box>
+                )}
             </Box>
 
             <Dialog open={dialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="sm">
