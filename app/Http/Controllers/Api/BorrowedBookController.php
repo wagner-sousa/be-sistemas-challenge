@@ -29,6 +29,25 @@ class BorrowedBookController extends Controller
     }
 
     public function store(BorrowBooksRequest $request): JsonResponse {
+        $idempotencyKey = $request->validated('idempotency_key');
+
+        // Check if this request was already processed
+        if ($idempotencyKey) {
+            $existingLoan = BorrowedBook::where('idempotency_key', $idempotencyKey)
+                ->where('user_id', Auth::id())
+                ->first();
+
+            if ($existingLoan) {
+                return response()
+                    ->json([
+                        'identifier' => $existingLoan->identifier,
+                        'idempotency_key' => $idempotencyKey,
+                        'duplicate' => true,
+                    ])
+                    ->setStatusCode(Response::HTTP_OK);
+            }
+        }
+
         try {
             foreach ($request->validated()['books'] as $bookId) {
                 $this->borrowedBookService->addBook($bookId);
@@ -41,9 +60,18 @@ class BorrowedBookController extends Controller
             ]);
         }
 
+        $identifier = $this->borrowedBookService->getIdentifier();
+
+        // Store idempotency key if provided
+        if ($idempotencyKey) {
+            BorrowedBook::where('identifier', $identifier)
+                ->update(['idempotency_key' => $idempotencyKey]);
+        }
+
         return response()
             ->json([
-                'identifier' => $this->borrowedBookService->getIdentifier(),
+                'identifier' => $identifier,
+                'idempotency_key' => $idempotencyKey,
             ])
             ->setStatusCode(Response::HTTP_CREATED);
     }

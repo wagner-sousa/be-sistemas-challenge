@@ -22,6 +22,7 @@ class BorrowedBook extends Model
         'book_id',
         'user_id',
         'identifier',
+        'idempotency_key',
         'started_at',
         'ended_at',
     ];

@@ -35,6 +35,7 @@ class BorrowBooksRequest extends FormRequest
         return [
             'books' => ['required', 'array', 'min:1'],
             'books.*' => ['integer', 'distinct', 'exists:books,id'],
+            'idempotency_key' => ['nullable', 'string', 'max:100'],
         ];
     }
 }
