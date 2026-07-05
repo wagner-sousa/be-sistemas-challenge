@@ -1,10 +1,10 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Book, BookPayload, useLibrary } from '@/contexts/LibraryContext';
 import { Head } from '@inertiajs/react';
-import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
-import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
-import EditIcon from '@mui/icons-material/Edit';
-import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckout';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import EditIcon from '@mui/icons-material/EditOutlined';
+import ShoppingCartCheckoutIcon from '@mui/icons-material/ShoppingCartCheckoutOutlined';
 import {
     Alert,
     Box,
@@ -152,12 +152,12 @@ export default function Index(): JSX.Element {
     return (
         <AuthenticatedLayout
             header={
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
                     <Box>
-                        <Typography variant="caption" sx={{ letterSpacing: 2, textTransform: 'uppercase' }}>
+                        <Typography variant="caption" sx={{ letterSpacing: 2, textTransform: 'uppercase', color: '#4b5563' }}>
                             Biblioteca
                         </Typography>
-                        <Typography variant="h5" fontWeight={600} color="text.primary">
+                        <Typography variant="h5" sx={{ fontWeight: 600, color: '#111827' }}>
                             Catálogo de livros
                         </Typography>
                     </Box>
@@ -167,6 +167,7 @@ export default function Index(): JSX.Element {
                             variant="outlined"
                             onClick={() => fetchBooks(true)}
                             disabled={loadingBooks}
+                            sx={{ color: '#111827', borderColor: '#d1d5db' }}
                         >
                             Recarregar
                         </Button>
@@ -174,6 +175,7 @@ export default function Index(): JSX.Element {
                             variant="contained"
                             startIcon={<AddCircleOutlineIcon />}
                             onClick={() => handleOpenDialog()}
+                            sx={{ backgroundColor: '#2563eb', color: '#ffffff', '&:hover': { backgroundColor: '#1d4ed8' } }}
                         >
                             Novo livro
                         </Button>
@@ -183,8 +185,8 @@ export default function Index(): JSX.Element {
         >
             <Head title="Livros" />
 
-            <Box sx={{ py: 6 }}>
-                <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 2 }}>
+            <Box sx={{ py: 6, backgroundColor: '#f3f4f6', minHeight: '100vh' }}>
+                <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 2, backgroundColor: '#ffffff' }}>
                     <Table>
                         <TableHead>
                             <TableRow>
@@ -223,13 +225,14 @@ export default function Index(): JSX.Element {
                                     <TableCell align="right">{book.borrowed_quantity}</TableCell>
                                     <TableCell align="right">{book.total_quantity}</TableCell>
                                     <TableCell align="right">
-                                        <Stack direction="row" spacing={1} justifyContent="flex-end">
+                                        <Stack direction="row" spacing={1} sx={{ justifyContent: 'flex-end' }}>
                                             <Button
                                                 size="small"
                                                 variant="outlined"
                                                 startIcon={<ShoppingCartCheckoutIcon />}
                                                 disabled={book.available_quantity <= 0 || saving}
                                                 onClick={() => handleBorrow(book.id)}
+                                                sx={{ color: '#2563eb', borderColor: '#2563eb', '&:hover': { backgroundColor: '#eff6ff' } }}
                                             >
                                                 Alugar
                                             </Button>
@@ -238,6 +241,7 @@ export default function Index(): JSX.Element {
                                                 variant="text"
                                                 startIcon={<EditIcon />}
                                                 onClick={() => handleOpenDialog(book)}
+                                                sx={{ color: '#4b5563', '&:hover': { backgroundColor: '#f3f4f6' } }}
                                             >
                                                 Editar
                                             </Button>
@@ -247,6 +251,7 @@ export default function Index(): JSX.Element {
                                                 color="error"
                                                 startIcon={<DeleteOutlineIcon />}
                                                 onClick={() => handleDelete(book.id)}
+                                                sx={{ color: '#dc2626', '&:hover': { backgroundColor: '#fef2f2' } }}
                                             >
                                                 Remover
                                             </Button>
@@ -282,13 +287,13 @@ export default function Index(): JSX.Element {
                             value={form.isbn_code}
                             onChange={(event) => handleFieldChange('isbn_code', event.target.value)}
                             required
-                            inputProps={{ maxLength: 13 }}
+                            slotProps={{ input: { inputProps: { maxLength: 13 } } }}
                             fullWidth
                         />
                         <TextField
                             label="Quantidade total"
                             type="number"
-                            inputProps={{ min: 1 }}
+                            slotProps={{ input: { inputProps: { min: 1 } } }}
                             value={form.total_quantity}
                             onChange={(event) =>
                                 handleFieldChange('total_quantity', Number(event.target.value))

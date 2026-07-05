@@ -11,15 +11,32 @@ Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
 });
 
 Route::middleware(['auth:sanctum'])->group(function (): void {
-    Route::apiResource('authors', AuthorController::class);
-    Route::apiResource('books', ApiBookController::class);
+    Route::apiResource('authors', AuthorController::class)->names([
+        'index' => 'api.authors.index',
+        'store' => 'api.authors.store',
+        'show' => 'api.authors.show',
+        'update' => 'api.authors.update',
+        'destroy' => 'api.authors.destroy',
+    ]);
+    Route::apiResource('books', ApiBookController::class)->names([
+        'index' => 'api.books.index',
+        'store' => 'api.books.store',
+        'show' => 'api.books.show',
+        'update' => 'api.books.update',
+        'destroy' => 'api.books.destroy',
+    ]);
 
     Route::post('borrowed-books/return/{identifier}', [BorrowedBookController::class, 'returnBooksByIdentifier'])
-        ->name('borrowed-books.return-by-identifier');
+        ->name('api.borrowed-books.return-by-identifier');
 
     Route::patch('borrowed-books/return/book/{borrowedBook}', [BorrowedBookController::class, 'returnBorrowedBook'])
-        ->name('borrowed-books.return');
+        ->name('api.borrowed-books.return');
 
     Route::apiResource('borrowed-books', BorrowedBookController::class)
-        ->only(['index', 'store', 'show']);
+        ->only(['index', 'store', 'show'])
+        ->names([
+            'index' => 'api.borrowed-books.index',
+            'store' => 'api.borrowed-books.store',
+            'show' => 'api.borrowed-books.show',
+        ]);
 });

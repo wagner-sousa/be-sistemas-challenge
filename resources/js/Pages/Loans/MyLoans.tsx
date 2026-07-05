@@ -1,8 +1,8 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Loan, useLibrary } from '@/contexts/LibraryContext';
 import { Head } from '@inertiajs/react';
-import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
-import ReplayIcon from '@mui/icons-material/Replay';
+import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedInOutlined';
+import ReplayIcon from '@mui/icons-material/ReplayOutlined';
 import {
     Alert,
     Box,
@@ -90,12 +90,12 @@ export default function MyLoans(): JSX.Element {
     return (
         <AuthenticatedLayout
             header={
-                <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
                     <Box>
-                        <Typography variant="caption" sx={{ letterSpacing: 2, textTransform: 'uppercase' }}>
+                        <Typography variant="caption" sx={{ letterSpacing: 2, textTransform: 'uppercase', color: '#4b5563' }}>
                             Meus empréstimos
                         </Typography>
-                        <Typography variant="h5" fontWeight={600} color="text.primary">
+                        <Typography variant="h5" sx={{ fontWeight: 600, color: '#111827' }}>
                             Controle de empréstimos
                         </Typography>
                     </Box>
@@ -105,6 +105,7 @@ export default function MyLoans(): JSX.Element {
                         startIcon={<ReplayIcon />}
                         onClick={() => fetchLoans(true)}
                         disabled={loadingLoans}
+                        sx={{ color: '#111827', borderColor: '#d1d5db' }}
                     >
                         Atualizar
                     </Button>
@@ -113,27 +114,29 @@ export default function MyLoans(): JSX.Element {
         >
             <Head title="Meus Empréstimos" />
 
-            <Stack spacing={3} sx={{ py: 6 }}>
-                <Paper sx={{ p: 2, borderRadius: 2 }} variant="outlined">
-                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-                        <TextField
-                            label="Identificador de empréstimo"
-                            value={identifier}
-                            onChange={(event) => setIdentifier(event.target.value)}
-                            fullWidth
-                        />
-                        <Button
-                            variant="contained"
-                            startIcon={<AssignmentTurnedInIcon />}
-                            onClick={handleReturnByIdentifier}
-                            disabled={processing || !identifier.trim()}
-                        >
-                            Devolver todos
-                        </Button>
-                    </Stack>
-                </Paper>
+            <Box sx={{ py: 6, backgroundColor: '#f3f4f6', minHeight: '100vh' }}>
+                <Stack spacing={3}>
+                    <Paper sx={{ p: 2, borderRadius: 2, backgroundColor: '#ffffff' }} variant="outlined">
+                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: 'center' }}>
+                            <TextField
+                                label="Identificador de empréstimo"
+                                value={identifier}
+                                onChange={(event) => setIdentifier(event.target.value)}
+                                fullWidth
+                            />
+                            <Button
+                                variant="contained"
+                                startIcon={<AssignmentTurnedInIcon />}
+                                onClick={handleReturnByIdentifier}
+                                disabled={processing || !identifier.trim()}
+                                sx={{ backgroundColor: '#2563eb', color: '#ffffff', '&:hover': { backgroundColor: '#1d4ed8' } }}
+                            >
+                                Devolver todos
+                            </Button>
+                        </Stack>
+                    </Paper>
 
-                <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2 }}>
+                <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2, backgroundColor: '#ffffff' }}>
                     <Table>
                         <TableHead>
                             <TableRow>
@@ -178,6 +181,7 @@ export default function MyLoans(): JSX.Element {
                                                 variant="outlined"
                                                 onClick={() => handleReturn(loan.id)}
                                                 disabled={processing}
+                                                sx={{ color: '#2563eb', borderColor: '#2563eb', '&:hover': { backgroundColor: '#eff6ff' } }}
                                             >
                                                 Devolver
                                             </Button>
@@ -189,6 +193,7 @@ export default function MyLoans(): JSX.Element {
                     </Table>
                 </TableContainer>
             </Stack>
+            </Box>
 
             <Snackbar
                 open={Boolean(feedback || error)}

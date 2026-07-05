@@ -1,4 +1,4 @@
-import { Pagination } from '@mui/material';
+import { Pagination as MuiPagination } from '@mui/material';
 
 type PaginationProps = {
     currentPage: number;
@@ -16,10 +16,10 @@ export default function PaginationComponent({
     }
 
     return (
-        <Pagination
+        <MuiPagination
             count={totalPages}
             page={currentPage}
-            onChange={(event, page) => onPageChange(page)}
+            onChange={(_event, page) => onPageChange(page)}
             color="primary"
             showFirstButton
             showLastButton
