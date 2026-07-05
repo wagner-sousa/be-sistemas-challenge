@@ -23,7 +23,6 @@ export async function apiFetch<T>(input: RequestInfo, init: RequestInit = {}): P
 
     headers.set('Accept', 'application/json');
     headers.set('X-Requested-With', 'XMLHttpRequest');
-
     if (csrfToken && !headers.has('X-CSRF-TOKEN')) {
         headers.set('X-CSRF-TOKEN', csrfToken);
     }

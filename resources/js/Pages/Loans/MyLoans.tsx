@@ -117,24 +117,24 @@ export default function MyLoans(): JSX.Element {
             <Box sx={{ py: 6, backgroundColor: '#f3f4f6', minHeight: '100vh' }}>
                 <Stack spacing={3}>
                     <Paper sx={{ p: 2, borderRadius: 2, backgroundColor: '#ffffff' }} variant="outlined">
-                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: 'center' }}>
-                        <TextField
-                            label="Identificador de empréstimo"
-                            value={identifier}
-                            onChange={(event) => setIdentifier(event.target.value)}
-                            fullWidth
-                        />
-                        <Button
-                            variant="contained"
-                            startIcon={<AssignmentTurnedInIcon />}
-                            onClick={handleReturnByIdentifier}
-                            disabled={processing || !identifier.trim()}
-                            sx={{ backgroundColor: '#2563eb', color: '#ffffff', '&:hover': { backgroundColor: '#1d4ed8' } }}
-                        >
-                            Devolver todos
-                        </Button>
-                    </Stack>
-                </Paper>
+                        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: 'center' }}>
+                            <TextField
+                                label="Identificador de empréstimo"
+                                value={identifier}
+                                onChange={(event) => setIdentifier(event.target.value)}
+                                fullWidth
+                            />
+                            <Button
+                                variant="contained"
+                                startIcon={<AssignmentTurnedInIcon />}
+                                onClick={handleReturnByIdentifier}
+                                disabled={processing || !identifier.trim()}
+                                sx={{ backgroundColor: '#2563eb', color: '#ffffff', '&:hover': { backgroundColor: '#1d4ed8' } }}
+                            >
+                                Devolver todos
+                            </Button>
+                        </Stack>
+                    </Paper>
 
                 <TableContainer component={Paper} variant="outlined" sx={{ borderRadius: 2, backgroundColor: '#ffffff' }}>
                     <Table>
