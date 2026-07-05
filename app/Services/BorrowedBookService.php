@@ -13,6 +13,7 @@ use App\Repositories\BorrowedBookRepository;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 use function collect;
@@ -72,6 +73,13 @@ final class BorrowedBookService
 
         $this->checkBorrowedBookByUser();
 
+        $userId = Auth::id();
+        Log::info('Iniciando processo de empréstimo', [
+            'user_id' => $userId,
+            'books_count' => $this->books->count(),
+            'book_ids' => $this->books->keys()->toArray(),
+        ]);
+
         DB::transaction(function (): void {
             $this->generateIdentifier();
 
@@ -88,6 +96,12 @@ final class BorrowedBookService
                 ]);
             });
         });
+
+        Log::info('Empréstimo realizado com sucesso', [
+            'user_id' => $userId,
+            'identifier' => $this->identifier,
+            'books_count' => $this->books->count(),
+        ]);
 
         $this->resetPreparedBooks();
     }
@@ -138,11 +152,22 @@ final class BorrowedBookService
             LoanAlreadyReturnedException::class
         );
 
+        Log::info('Iniciando devolução de livro', [
+            'borrowed_book_id' => $borrowedBook->id,
+            'book_id' => $borrowedBook->book_id,
+            'user_id' => $borrowedBook->user_id,
+        ]);
+
         DB::transaction(function () use ($borrowedBook): void {
             $borrowedBook->update([
                 'ended_at' => now(),
             ]);
         });
+
+        Log::info('Livro devolvido com sucesso', [
+            'borrowed_book_id' => $borrowedBook->id,
+            'book_id' => $borrowedBook->book_id,
+        ]);
     }
 
     public function getIdentifier(): string {
