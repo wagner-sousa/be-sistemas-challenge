@@ -46,16 +46,29 @@ export type Loan = {
 
 type Paginated<T> = {
     data: T[];
+    current_page: number;
+    last_page: number;
+    per_page: number;
+    total: number;
+};
+
+type PaginationMeta = {
+    currentPage: number;
+    totalPages: number;
+    perPage: number;
+    total: number;
 };
 
 type LibraryContextValue = {
     books: Book[] | null;
     loans: Loan[] | null;
+    booksPagination: PaginationMeta | null;
+    loansPagination: PaginationMeta | null;
     loadingBooks: boolean;
     loadingLoans: boolean;
     error: string | null;
-    fetchBooks: (force?: boolean) => Promise<Book[]>;
-    fetchLoans: (force?: boolean) => Promise<Loan[]>;
+    fetchBooks: (force?: boolean, page?: number) => Promise<Book[]>;
+    fetchLoans: (force?: boolean, page?: number) => Promise<Loan[]>;
     createBook: (payload: BookPayload) => Promise<Book>;
     updateBook: (id: number, payload: BookPayload) => Promise<Book>;
     deleteBook: (id: number) => Promise<void>;
@@ -70,20 +83,31 @@ const LibraryContext = createContext<LibraryContextValue | null>(null);
 export function LibraryProvider({ children }: PropsWithChildren): JSX.Element {
     const [books, setBooks] = useState<Book[] | null>(null);
     const [loans, setLoans] = useState<Loan[] | null>(null);
+    const [booksPagination, setBooksPagination] = useState<PaginationMeta | null>(null);
+    const [loansPagination, setLoansPagination] = useState<PaginationMeta | null>(null);
     const [loadingBooks, setLoadingBooks] = useState(false);
     const [loadingLoans, setLoadingLoans] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const parsePaginated = <T,>(payload: Paginated<T> | T[]): T[] => {
+    const parsePaginated = <T,>(payload: Paginated<T> | T[]): { data: T[]; pagination?: PaginationMeta } => {
         if (Array.isArray(payload)) {
-            return payload as T[];
+            return { data: payload as T[] };
         }
 
         if (typeof payload === 'object' && payload !== null && 'data' in payload) {
-            return (payload as Paginated<T>).data;
+            const paginated = payload as Paginated<T>;
+            return {
+                data: paginated.data,
+                pagination: {
+                    currentPage: paginated.current_page,
+                    totalPages: paginated.last_page,
+                    perPage: paginated.per_page,
+                    total: paginated.total,
+                },
+            };
         }
 
-        return [];
+        return { data: [] };
     };
 
     const handleError = (exception: unknown): never => {
@@ -92,17 +116,20 @@ export function LibraryProvider({ children }: PropsWithChildren): JSX.Element {
         throw exception instanceof Error ? exception : new Error(message);
     };
 
-    const fetchBooks = useCallback(async (force = false): Promise<Book[]> => {
-        if (books && !force) {
+    const fetchBooks = useCallback(async (force = false, page = 1): Promise<Book[]> => {
+        if (books && !force && page === booksPagination?.currentPage) {
             return books;
         }
 
         setLoadingBooks(true);
 
         try {
-            const response = await apiFetch<Paginated<Book>>('/api/books');
-            const data = parsePaginated<Book>(response);
+            const response = await apiFetch<Paginated<Book>>(`/api/books?page=${page}`);
+            const { data, pagination } = parsePaginated<Book>(response);
             setBooks(data);
+            if (pagination) {
+                setBooksPagination(pagination);
+            }
             setError(null);
             return data;
         } catch (exception) {
@@ -110,26 +137,30 @@ export function LibraryProvider({ children }: PropsWithChildren): JSX.Element {
         } finally {
             setLoadingBooks(false);
         }
-    }, [books]);
+    }, [books, booksPagination]);
 
-    const fetchLoans = useCallback(async (force = false): Promise<Loan[]> => {
-        if (loans && !force) {
+    const fetchLoans = useCallback(async (force = false, page = 1): Promise<Loan[]> => {
+        if (loans && !force && page === loansPagination?.currentPage) {
             return loans;
         }
 
         setLoadingLoans(true);
 
         try {
-            const response = await apiFetch<{ data: Loan[] }>('/api/borrowed-books');
-            setLoans(response.data);
+            const response = await apiFetch<Paginated<Loan>>(`/api/borrowed-books?page=${page}`);
+            const { data, pagination } = parsePaginated<Loan>(response);
+            setLoans(data);
+            if (pagination) {
+                setLoansPagination(pagination);
+            }
             setError(null);
-            return response.data;
+            return data;
         } catch (exception) {
             return handleError(exception);
         } finally {
             setLoadingLoans(false);
         }
-    }, [loans]);
+    }, [loans, loansPagination]);
 
     const createBook = useCallback(async (payload: BookPayload): Promise<Book> => {
         try {
@@ -241,6 +272,8 @@ export function LibraryProvider({ children }: PropsWithChildren): JSX.Element {
         () => ({
             books,
             loans,
+            booksPagination,
+            loansPagination,
             loadingBooks,
             loadingLoans,
             error,
@@ -257,6 +290,8 @@ export function LibraryProvider({ children }: PropsWithChildren): JSX.Element {
         [
             books,
             loans,
+            booksPagination,
+            loansPagination,
             loadingBooks,
             loadingLoans,
             error,
