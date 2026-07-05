@@ -27,9 +27,11 @@ Route::middleware(['auth:sanctum'])->group(function (): void {
     ]);
 
     Route::post('borrowed-books/return/{identifier}', [BorrowedBookController::class, 'returnBooksByIdentifier'])
+        ->middleware('throttle:borrow')
         ->name('api.borrowed-books.return-by-identifier');
 
     Route::patch('borrowed-books/return/book/{borrowedBook}', [BorrowedBookController::class, 'returnBorrowedBook'])
+        ->middleware('throttle:borrow')
         ->name('api.borrowed-books.return');
 
     Route::apiResource('borrowed-books', BorrowedBookController::class)
@@ -38,5 +40,6 @@ Route::middleware(['auth:sanctum'])->group(function (): void {
             'index' => 'api.borrowed-books.index',
             'store' => 'api.borrowed-books.store',
             'show' => 'api.borrowed-books.show',
-        ]);
+        ])
+        ->middleware('throttle:borrow');
 });
