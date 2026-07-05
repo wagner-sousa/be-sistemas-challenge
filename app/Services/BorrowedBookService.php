@@ -2,6 +2,10 @@
 
 namespace App\Services;
 
+use App\Exceptions\BookUnavailableException;
+use App\Exceptions\BorrowLimitExceededException;
+use App\Exceptions\LoanAlreadyReturnedException;
+use App\Exceptions\LoanNotFoundException;
 use App\Models\Book;
 use App\Models\BorrowedBook;
 use App\Models\User;
@@ -32,8 +36,9 @@ final class BorrowedBookService
     public function checkBookPreparedQuantity(): void {
         throw_if(
             $this->books->count() >= $this->getBorrowBooksLimit(),
-            \Exception::class,
-            'Limite de livros preparados para o empréstimo atingido!'
+            BorrowLimitExceededException::class,
+            $this->books->count(),
+            $this->getBorrowBooksLimit()
         );
     }
 
@@ -98,19 +103,17 @@ final class BorrowedBookService
 
         throw_if(
             ($user->current_borrowed_books + $requestedBooks) > $limit,
-            \Exception::class,
-            sprintf(
-                'Limite de livros emprestados atingido, o usuário já possui %d livros emprestados!',
-                $user->current_borrowed_books
-            )
+            BorrowLimitExceededException::class,
+            $user->current_borrowed_books,
+            $limit
         );
     }
 
     private function checkBookAvailable(Book $book): void {
         throw_if(
             $book->refresh()->available_quantity <= 0,
-            \Exception::class,
-            'Quantidade de livros disponíveis insuficiente!'
+            BookUnavailableException::class,
+            $book->title
         );
     }
 
@@ -119,8 +122,7 @@ final class BorrowedBookService
 
         throw_if(
             $borrowedBooks->isEmpty(),
-            \Exception::class,
-            'Nenhum livro encontrado para devolução com o identificador fornecido!'
+            LoanNotFoundException::class
         );
 
         DB::transaction(function () use ($borrowedBooks): void {
@@ -133,8 +135,7 @@ final class BorrowedBookService
     public function returnBook(BorrowedBook $borrowedBook): void {
         throw_if(
             !is_null($borrowedBook->ended_at),
-            \Exception::class,
-            'Este empréstimo já foi finalizado.',
+            LoanAlreadyReturnedException::class
         );
 
         DB::transaction(function () use ($borrowedBook): void {

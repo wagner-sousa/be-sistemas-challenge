@@ -61,7 +61,7 @@ it('blocks borrowing when user already reached the configured limit', function (
     $service = makeServiceWithBook($book);
 
     expect(fn () => $service->commitBorrowBooks())
-        ->toThrow(Exception::class, 'Limite de livros emprestados atingido, o usuário já possui 3 livros emprestados!');
+        ->toThrow(Exception::class, 'Você já possui 3 livros emprestados. O limite é de 3 empréstimos ativos.');
 
     expect(BorrowedBook::query()->count())->toBe(0);
 });

@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Data\BorrowedBookData;
+use App\Exceptions\BookUnavailableException;
+use App\Exceptions\BorrowLimitExceededException;
+use App\Exceptions\LoanAlreadyReturnedException;
+use App\Exceptions\LoanNotFoundException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BorrowBooksRequest;
 use App\Models\BorrowedBook;
@@ -35,6 +39,14 @@ class BorrowedBookController extends Controller
             }
 
             $this->borrowedBookService->commitBorrowBooks();
+        } catch (BookUnavailableException $exception) {
+            throw ValidationException::withMessages([
+                'borrowed_books' => $exception->getMessage(),
+            ]);
+        } catch (BorrowLimitExceededException $exception) {
+            throw ValidationException::withMessages([
+                'borrowed_books' => $exception->getMessage(),
+            ]);
         } catch (\Exception $exception) {
             throw ValidationException::withMessages([
                 'borrowed_books' => $exception->getMessage(),
@@ -57,6 +69,10 @@ class BorrowedBookController extends Controller
     public function returnBorrowedBook(Request $request, BorrowedBook $borrowedBook): JsonResponse {
         try {
             $this->borrowedBookService->returnBook($borrowedBook);
+        } catch (LoanAlreadyReturnedException $exception) {
+            throw ValidationException::withMessages([
+                'borrowed_book' => $exception->getMessage(),
+            ]);
         } catch (\Exception $exception) {
             throw ValidationException::withMessages([
                 'borrowed_book' => $exception->getMessage(),
@@ -71,6 +87,10 @@ class BorrowedBookController extends Controller
     public function returnBooksByIdentifier(string $identifier): JsonResponse {
         try {
             $this->borrowedBookService->returnAllBooks($identifier);
+        } catch (LoanNotFoundException $exception) {
+            throw ValidationException::withMessages([
+                'identifier' => $exception->getMessage(),
+            ]);
         } catch (\Exception $exception) {
             throw ValidationException::withMessages([
                 'identifier' => $exception->getMessage(),
